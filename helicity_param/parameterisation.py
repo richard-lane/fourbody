@@ -32,17 +32,79 @@ def _m_plus_minus(k, pi1, pi2, pi3, verbose=False):
     return invariant_masses(*np.add(k, pi3)), invariant_masses(*np.add(pi1, pi2))
 
 
+def _stationary(particles):
+    """
+    Returns bool mask of whether particles are stationary
+
+    TODO speedup
+
+    """
+    # Start by assuming all particles are moving
+    n_particles = len(particles[0])
+    rv = np.zeros(n_particles, dtype=np.bool_)
+
+    # A particle is stationary if any of its x, y or z momenta are not close to 0
+    # For our purposes, this means <10^-7 or so
+    # If this causes a bug, its your own fault for using units where 10^-7 is a meaningful nonzero momentum
+    for i in range(n_particles):
+        if (
+            np.isclose(particles[0][i], 0.0)
+            and np.isclose(particles[1][i], 0.0)
+            and np.isclose(particles[2][i], 0.0)
+        ):
+            # The particle is stationary
+            rv[i] = True
+
+    return rv
+
+
+def _convert_to_pylorentz(*particles):
+    """
+    Just converts our particles to pylorentz Momentum4 instances
+
+    """
+    return (pylorentz.Momentum4(p[3], *p[0:3]) for p in particles)
+
+
+def _boost_not_stationary(target, *particles):
+    """
+    Boost particles into another's rest frame, assuming the target particles are not stationary
+
+    """
+    target_4v, = _convert_to_pylorentz(target)
+    particles_4v = _convert_to_pylorentz(*particles)
+
+    return (p.boost_particle(target_4v) for p in particles_4v)
+
+
 def _boost(target, *particles):
     """
     Boost particles into the frame of target
 
-    """
-    # Create 4 vectors
-    target_4v = pylorentz.Momentum4(target[3], *target[0:3])
-    particles_4v = (pylorentz.Momentum4(p[3], *-p[0:3]) for p in particles)
+    NB this returns a generator, so call it like:
 
-    # Boost
-    return (p.boost_particle(target_4v) for p in particles_4v)
+    boosted_particle, = _boost(target, particle)
+    (boosted_k, boosted_pi) = _boost(target, k, pi)
+
+    note the comma
+
+    """
+    # Find whether our target particles are moving
+    stationary = _stationary(target)
+
+    # No particles are stationary - probably the mainline case
+    if np.all(~stationary):
+        return _boost_not_stationary(target, *particles)
+
+    # All particles are stationary - also relatively common if our particles were e.g. generated from an amplitude model
+    elif np.all(stationary):
+        return _convert_to_pylorentz(*particles)
+
+    # Boosting particles into a stationary frame can cause NaNs to appear
+    # If we get here, it means some but not all of the target particles are stationary
+    # If they are, undo the boost by replacing the calculated particle momenta with their original values
+    # Evaluted afterwards so we can use the pylorentz array functionality
+    raise NotImplementedError("I haven't got round to implementing the case where only some of the target particles are moving")
 
 
 def _cos_theta(hadron1, hadron2, d, verbose=False):
