@@ -77,7 +77,7 @@ def test_convert_one():
     """
     particles = np.array([[0.0, 1.0], [0.0, 1.0], [0.0, 1.0], [1.0, 25.0]])
 
-    converted, = parameterisation._convert_to_pylorentz(particles)
+    (converted,) = parameterisation._convert_to_pylorentz(particles)
 
     assert isinstance(converted, pylorentz.Momentum4)
 
@@ -117,7 +117,7 @@ def test_boost_not_stationary():
         ]
     )
 
-    boosted_particle, = parameterisation._boost_not_stationary(target, particle)
+    (boosted_particle,) = parameterisation._boost_not_stationary(target, particle)
 
     assert np.allclose(
         [
@@ -140,7 +140,7 @@ def test_no_op_boost():
     # Target particle has no 3-momentum; it's stationary, so our boost shouldn't do anything
     target = np.array([[0.0], [0.0], [0.0], [1.8]])
 
-    boosted_particle, = parameterisation._boost(target, particle)
+    (boosted_particle,) = parameterisation._boost(target, particle)
 
     assert np.allclose(
         [
@@ -197,7 +197,7 @@ def test_all_moving_boost():
         ]
     )
 
-    boosted, = parameterisation._boost(target, tuple(particle))
+    (boosted,) = parameterisation._boost(target, tuple(particle))
 
     assert np.allclose(
         [boosted.p_x[0], boosted.p_y[0], boosted.p_z[0], boosted.e[0]], expected_1

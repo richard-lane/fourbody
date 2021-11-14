@@ -71,7 +71,7 @@ def _boost_not_stationary(target, *particles):
     Boost particles into another's rest frame, assuming the target particles are not stationary
 
     """
-    target_4v, = _convert_to_pylorentz(target)
+    (target_4v,) = _convert_to_pylorentz(target)
     particles_4v = _convert_to_pylorentz(*particles)
 
     return (p.boost_particle(target_4v) for p in particles_4v)
@@ -104,7 +104,9 @@ def _boost(target, *particles):
     # If we get here, it means some but not all of the target particles are stationary
     # If they are, undo the boost by replacing the calculated particle momenta with their original values
     # Evaluted afterwards so we can use the pylorentz array functionality
-    raise NotImplementedError("I haven't got round to implementing the case where only some of the target particles are moving")
+    raise NotImplementedError(
+        "I haven't got round to implementing the case where only some of the target particles are moving"
+    )
 
 
 def _cos_theta(hadron1, hadron2, d, verbose=False):
