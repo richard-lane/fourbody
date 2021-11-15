@@ -2,20 +2,19 @@
 Check how the helicity parameterisation looks with phsp
 
 """
-from helicity_param.parameterisation import *
 
-import sys, os
+import pytest
 import numpy as np
 import matplotlib.pyplot as plt
 import phasespace as ps
 
+from helicity_param import parameterisation
 
-def _make_phsp():
+
+@pytest.fixture(scope="session")
+def _phsp():
     """
-    TODO fixture
-    Make some four-body phsp evts for a made-up decay X->abcd
-
-    Return momentum/energy arrays and decay times
+    Make some phsp evts
 
     """
     a_mass = 0.139570
@@ -29,7 +28,7 @@ def _make_phsp():
         x_mass, (a_mass, b_mass, c_mass, d_mass), names=("a", "b", "c", "d")
     )
 
-    N = 10000  # Number of evts to generate, but some will get thrown away
+    N = 1000  # Number of evts to generate, but some will get thrown away
     weights, particles = generator.generate(N, normalize_weights=True)
 
     # Create a mask for accept-reject based on weights
@@ -47,50 +46,45 @@ def _make_phsp():
     return a, b, c, d, times
 
 
-def test_projections():
+def test_projections(_phsp):
     # Generate phsp
-    k, pi1, pi2, pi3, t = _make_phsp()
+    k, pi1, pi2, pi3, t = _phsp
 
     # Parametrise
-    points = helicity_param(k, pi1, pi2, pi3, t, verbose=True)
-
-    assert points is not None
+    points = parameterisation.helicity_param(k, pi1, pi2, pi3, t, verbose=True)
 
     # Plot projections
-    # fig, ax = plt.subplots(2, 3, figsize=(12, 6))
-    # kw = {"histtype": "step"}
-    # labels = (
-    #    r"$M(K^+\pi^+) /GeV$",
-    #    r"$M(\pi_1^-\pi_2^-)$",
-    #    r"$cos(\theta^+)$",
-    #    r"$cos(\theta^-)$",
-    #    r"$\phi$",
-    #    r"$t /ps$",
-    # )
-    # bins = (
-    #    np.linspace(0.5, 1.7),
-    #    np.linspace(0.2, 1.5),
-    #    np.linspace(0.0, 1.0),
-    #    np.linspace(0.0, 1.0),
-    #    np.linspace(0.0, np.pi),
-    #    np.linspace(0.0, 3.0),
-    # )
+    fig, ax = plt.subplots(2, 3, figsize=(12, 6))
+    kw = {"histtype": "step"}
+    labels = (
+        r"$M(K^+\pi^+) /GeV$",
+        r"$M(\pi_1^-\pi_2^-)$",
+        r"$cos(\theta^+)$",
+        r"$cos(\theta^-)$",
+        r"$\phi$",
+        r"$t /ps$",
+    )
+    bins = (
+        np.linspace(0.5, 1.7),
+        np.linspace(0.2, 1.5),
+        np.linspace(0.0, 1.0),
+        np.linspace(0.0, 1.0),
+        np.linspace(0.0, np.pi),
+        np.linspace(0.0, 3.0),
+    )
 
-    # for i, (a, l, b) in enumerate(zip(ax.flatten(), labels, bins)):
-    #    kw["bins"] = b
-    #    a.hist(points[:, i], **kw, label="Phsp", weights=w)
-    #    a.set_xlabel(l)
+    for i, (a, l, b) in enumerate(zip(ax.flatten(), labels, bins)):
+        kw["bins"] = b
+        a.hist(points[:, i], **kw, label="Phsp")
+        a.set_xlabel(l)
 
-    # ax.flatten()[-1].legend()
-    # fig.set_tight_layout(True)
+    ax.flatten()[-1].legend()
+    fig.set_tight_layout(True)
 
-    # phi = points[:, 4]
+    phi = points[:, 4]
 
-    # path = "helicity_phsp.png"
-    # print(f"saving {path}")
-    # plt.savefig(path)
-
-    # corr_plot(points, labels)
+    path = "helicity_phsp.png"
+    plt.savefig(path)
 
 
 def test_phi_consistency():

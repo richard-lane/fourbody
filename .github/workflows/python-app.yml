@@ -29,10 +29,19 @@ jobs:
         pytest test/ut/test_ut.py --cov=./ --cov-report=xml:ut.xml
     - name: Integration Test
       run: |
-        pip install phasespace matplotlib
+        pip install phasespace
         pytest test/it/test_it.py --cov=./ --cov-report=xml:it.xml
+    - name: Validation
+      run: |
+        pip install matplotlib
+        pytest test/script/validation.py --cov=./ --cov-report=xml:validation.xml
     - name: Upload coverage
       uses: codecov/codecov-action@v1
       with:
         fail_ci_if_error: true
-        files: ut.xml,it.xml
+        files: ut.xml,it.xml,validation.xml
+    - name: Upload Plots
+      uses: actions/upload-artifact@v2
+      with:
+        name: phsp-plot
+        path: helicity_phsp.png
