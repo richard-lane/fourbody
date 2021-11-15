@@ -107,13 +107,12 @@ def test_boost_not_stationary():
     gamma, beta = 2.0, np.sqrt(3) / 2.0
     target = np.array([[gamma * beta * m], [0.0], [0.0], [gamma * m]])
 
-    # Might have accidentally done the boost backwards. We'll see if it affects anything...
     expected = np.array(
         [
-            beta * gamma * particle[3][0] + gamma * particle[0][0],  # px
+            -beta * gamma * particle[3][0] + gamma * particle[0][0],  # px
             particle[1][0],
             particle[2][0],
-            gamma * particle[3][0] + beta * gamma * particle[0][0],  # energy
+            gamma * particle[3][0] - beta * gamma * particle[0][0],  # energy
         ]
     )
 
@@ -182,18 +181,18 @@ def test_all_moving_boost():
     # Might have accidentally done the boost backwards. We'll see if it affects anything...
     expected_1 = np.array(
         [
-            beta * gamma * particle[3][0] + gamma * particle[0][0],  # px
+            -beta * gamma * particle[3][0] + gamma * particle[0][0],  # px
             particle[1][0],
             particle[2][0],
-            gamma * particle[3][0] + beta * gamma * particle[0][0],  # energy
+            gamma * particle[3][0] - beta * gamma * particle[0][0],  # energy
         ]
     )
     expected_2 = np.array(
         [
-            beta * gamma * particle[3][1] + gamma * particle[0][1],  # px
+            -beta * gamma * particle[3][1] + gamma * particle[0][1],  # px
             particle[1][1],
             particle[2][1],
-            gamma * particle[3][1] + beta * gamma * particle[0][1],  # energy
+            gamma * particle[3][1] - beta * gamma * particle[0][1],  # energy
         ]
     )
 

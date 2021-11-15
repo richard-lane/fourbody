@@ -27,12 +27,12 @@ jobs:
     - name: Unit Test
       run: |
         pytest test/ut/test_ut.py --cov=./ --cov-report=xml:ut.xml
-    # - name: Integration Test
-    #   run: |
-    #     pip install phasespace matplotlib
-    #     pytest lorentz-boost/test/test_boosts.py --cov=./ --cov-report=xml:it.xml
+    - name: Integration Test
+      run: |
+        pip install phasespace matplotlib
+        pytest test/it/test_it.py --cov=./ --cov-report=xml:it.xml
     - name: Upload coverage
       uses: codecov/codecov-action@v1
       with:
         fail_ci_if_error: true
-        files: ./ut.xml
+        files: ut.xml,it.xml
