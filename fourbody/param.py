@@ -14,7 +14,6 @@ def _verify_args(h1, h2, h3, h4):
     assert h3.shape[0] == 4, "h3_minus should be a shape (4, N) array"
     assert h4.shape[0] == 4, "h4_plus should be a shape (4, N) array"
 
-
     # Check they all contain the same number of particles
     n_particles = len(h1[0])
     assert h2.shape[1] == n_particles, "h2_minus and h1_plus are different lengths"
