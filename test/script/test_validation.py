@@ -9,7 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import phasespace as ps
 
-from helicity_param import parameterisation
+from fourbody import param
+from fourbody import boosts
+from fourbody import util
 
 
 @pytest.fixture(scope="session")
@@ -41,18 +43,15 @@ def _phsp():
     c = particles["c"].numpy()[keep_mask].T
     d = particles["d"].numpy()[keep_mask].T
 
-    # Decay times will just be an exponential
-    times = np.random.exponential(size=n_kept)
-
-    return a, b, c, d, times
+    return a, b, c, d
 
 
 def test_projections(_phsp):
     # Generate phsp
-    pi1, pi2, k1, k2, t = _phsp
+    pi1, pi2, k1, k2 = _phsp
 
     # Parametrise
-    points = parameterisation.helicity_param(k1, pi1, k2, pi2, t, verbose=True)
+    points = param.helicity_param(k1, pi1, k2, pi2)
 
     # Plot projections
     fig, ax = plt.subplots(2, 3, figsize=(12, 6))
@@ -63,7 +62,6 @@ def test_projections(_phsp):
         r"$cos(\theta^+)$",
         r"$cos(\theta^-)$",
         r"$\phi$",
-        r"$t /ps$",
     )
     bins = (
         np.linspace(0.6, 1.4),
@@ -71,18 +69,15 @@ def test_projections(_phsp):
         np.linspace(0.0, 1.0),
         np.linspace(0.0, 1.0),
         np.linspace(0.0, np.pi),
-        np.linspace(0.0, 3.0),
     )
 
-    for i, (a, l, b) in enumerate(zip(ax.flatten(), labels, bins)):
+    for i, (a, l, b) in enumerate(zip(ax.flatten()[:-1], labels, bins)):
         kw["bins"] = b
         a.hist(points[:, i], **kw, label="Phsp")
         a.set_xlabel(l)
 
     ax.flatten()[-1].legend()
     fig.set_tight_layout(True)
-
-    phi = points[:, 4]
 
     path = "helicity_phsp.png"
     plt.savefig(path)
@@ -94,10 +89,10 @@ def test_phi_consistency(_phsp):
     Check that sin2 + cos2 phi = 1
 
     """
-    pi1, pi2, k1, k2, _ = _phsp
+    pi1, pi2, k1, k2 = _phsp
 
-    sin = parameterisation.sin_phi(k1, pi1, k2, pi2)
-    cos = parameterisation._cos_phi(k1, pi1, k2, pi2)
+    sin = util.sin_phi(k1, pi1, k2, pi2)
+    cos = util.cos_phi(k1, pi1, k2, pi2)
 
     sum = sin ** 2 + cos ** 2
 
@@ -113,7 +108,7 @@ def test_boosts(_phsp):
     Check that boosts correctly take us into the rest frame of our particle
 
     """
-    pi1, pi2, k1, k2, _ = _phsp
+    pi1, pi2, k1, k2 = _phsp
 
     def _3momm(particle):
         if isinstance(particle, pylorentz.Momentum4):
@@ -141,15 +136,15 @@ def test_boosts(_phsp):
     _plot(ax[0, 0], k1, pi1, "Lab Frame")
 
     # Boost particles into the k frame
-    boosted_k, boosted_pi1 = parameterisation._boost(k1, k1, pi1)
+    boosted_k, boosted_pi1 = boosts.boost(k1, k1, pi1)
     _plot(ax[0, 1], boosted_k, boosted_pi1, "K Frame")
 
     # Boost particles into the pi frame
-    boosted_k, boosted_pi1 = parameterisation._boost(pi1, k1, pi1)
+    boosted_k, boosted_pi1 = boosts.boost(pi1, k1, pi1)
     _plot(ax[1, 0], boosted_k, boosted_pi1, title=r"$\pi$ Frame")
 
     # Boost particles into the k+pi frame
-    boosted_k, boosted_pi1 = parameterisation._boost(np.add(pi1, k1), k1, pi1)
+    boosted_k, boosted_pi1 = boosts.boost(np.add(pi1, k1), k1, pi1)
     _plot(ax[1, 1], boosted_k, boosted_pi1, title=r"$K\pi$ Frame")
 
     fig.suptitle(r"3 Momenta of K, $\pi$ in different frames")
@@ -162,8 +157,8 @@ def test_correlation(_phsp):
     Plot correlations
 
     """
-    pi1, pi2, k1, k2, t = _phsp
-    points = parameterisation.helicity_param(k1, pi1, k2, pi2, t, verbose=True)
+    pi1, pi2, k1, k2 = _phsp
+    points = param.helicity_param(k1, pi1, k2, pi2)
 
     d = len(points[0])
     corr = np.ones((d, d))
@@ -179,14 +174,13 @@ def test_correlation(_phsp):
         r"$cos(\theta^+)$",
         r"$cos(\theta^-)$",
         r"$\phi$",
-        r"$t /ps$",
     )
 
     im = ax.imshow(corr)
     ax.set_title("Correlations")
-    ax.set_xticks([i for i in range(6)])
+    ax.set_xticks([i for i in range(d)])
     ax.set_xticklabels(labels, rotation=90)
-    ax.set_yticks([i for i in range(6)])
+    ax.set_yticks([i for i in range(d)])
     ax.set_yticklabels(labels)
 
     fig.subplots_adjust(right=0.9)

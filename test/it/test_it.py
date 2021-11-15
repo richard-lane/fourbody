@@ -6,7 +6,8 @@ import pytest
 import numpy as np
 import phasespace as ps
 
-from helicity_param import parameterisation
+from fourbody import boosts
+from fourbody import util
 
 
 @pytest.fixture(scope="session")
@@ -38,10 +39,7 @@ def _phsp():
     c = particles["c"].numpy()[keep_mask].T
     d = particles["d"].numpy()[keep_mask].T
 
-    # Decay times will just be an exponential
-    times = np.random.exponential(size=n_kept)
-
-    return a, b, c, d, times
+    return a, b, c, d
 
 
 def test_boost(_phsp):
@@ -49,9 +47,10 @@ def test_boost(_phsp):
     Boost into the rest frame of a particle, check its three momenta are zero
 
     """
-    a, _, _, _, _ = _phsp
 
-    (boosted_a,) = parameterisation._boost(a, a)
+    a, _, _, _ = _phsp
+
+    (boosted_a,) = boosts.boost(a, a)
 
     assert np.allclose(boosted_a.p_x, np.zeros_like(boosted_a.p_x))
     assert np.allclose(boosted_a.p_y, np.zeros_like(boosted_a.p_y))
@@ -63,10 +62,10 @@ def test_boost_sum(_phsp):
     Boost into the rest frame of a system of two particles, check that our combined three momenta are 0
 
     """
-    a, b, _, _, _ = _phsp
+    a, b, _, _ = _phsp
     n_particles = len(a[0])
 
-    boosted_a, boosted_b = parameterisation._boost(np.add(a, b), a, b)
+    boosted_a, boosted_b = boosts.boost(np.add(a, b), a, b)
 
     assert np.allclose(boosted_a.p_x + boosted_b.p_x, np.zeros(n_particles))
     assert np.allclose(boosted_a.p_y + boosted_b.p_y, np.zeros(n_particles))
@@ -78,10 +77,10 @@ def test_sin_cos_phi_consistency(_phsp):
     Check that sin2 + cos2 phi = 1 for our phsp evts
 
     """
-    a, b, c, d, _ = _phsp
+    a, b, c, d = _phsp
 
-    sin_phi = parameterisation.sin_phi(a, b, c, d)
-    cos_phi = parameterisation._cos_phi(a, b, c, d)
+    sin_phi = util.sin_phi(a, b, c, d)
+    cos_phi = util.cos_phi(a, b, c, d)
 
     sum = sin_phi ** 2 + cos_phi ** 2
 

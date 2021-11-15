@@ -6,8 +6,7 @@ name: Python application
 on: [push, pull_request]
 
 jobs:
-  build:
-
+  Tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,19 +21,19 @@ jobs:
         pip install black==21.10b0 numpy pylorentz pytest pytest-cov
     - name: Lint with black
       run: |
-        black --check helicity_param/**
+        black --check fourbody/**
         black --check test/**
     - name: Unit Test
       run: |
-        pytest test/ut/test_ut.py --cov=./ --cov-report=xml:ut.xml
+        pytest test/ut/ --cov=./ --cov-report=xml:ut.xml
     - name: Integration Test
       run: |
         pip install phasespace
-        pytest test/it/test_it.py --cov=./ --cov-report=xml:it.xml
+        pytest test/it/ --cov=./ --cov-report=xml:it.xml
     - name: Validation
       run: |
         pip install matplotlib
-        pytest test/script/validation.py --cov=./ --cov-report=xml:validation.xml
+        pytest test/script/ -W error::UserWarning --cov=./ --cov-report=xml:validation.xml
     - name: Upload coverage
       uses: codecov/codecov-action@v1
       with:
