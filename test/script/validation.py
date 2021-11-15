@@ -4,6 +4,7 @@ Check how the helicity parameterisation looks with phsp
 """
 
 import pytest
+import pylorentz
 import numpy as np
 import matplotlib.pyplot as plt
 import phasespace as ps
@@ -28,7 +29,7 @@ def _phsp():
         x_mass, (a_mass, b_mass, c_mass, d_mass), names=("a", "b", "c", "d")
     )
 
-    N = 1000  # Number of evts to generate, but some will get thrown away
+    N = 50000  # Number of evts to generate, but some will get thrown away
     weights, particles = generator.generate(N, normalize_weights=True)
 
     # Create a mask for accept-reject based on weights
@@ -48,25 +49,25 @@ def _phsp():
 
 def test_projections(_phsp):
     # Generate phsp
-    k, pi1, pi2, pi3, t = _phsp
+    pi1, pi2, k1, k2, t = _phsp
 
     # Parametrise
-    points = parameterisation.helicity_param(k, pi1, pi2, pi3, t, verbose=True)
+    points = parameterisation.helicity_param(k1, pi1, k2, pi2, t, verbose=True)
 
     # Plot projections
     fig, ax = plt.subplots(2, 3, figsize=(12, 6))
     kw = {"histtype": "step"}
     labels = (
         r"$M(K^+\pi^+) /GeV$",
-        r"$M(\pi_1^-\pi_2^-)$",
+        r"$M(K^-\pi^-)$",
         r"$cos(\theta^+)$",
         r"$cos(\theta^-)$",
         r"$\phi$",
         r"$t /ps$",
     )
     bins = (
-        np.linspace(0.5, 1.7),
-        np.linspace(0.2, 1.5),
+        np.linspace(0.6, 1.4),
+        np.linspace(0.6, 1.4),
         np.linspace(0.0, 1.0),
         np.linspace(0.0, 1.0),
         np.linspace(0.0, np.pi),
@@ -85,19 +86,114 @@ def test_projections(_phsp):
 
     path = "helicity_phsp.png"
     plt.savefig(path)
+    plt.clf()
 
 
-def test_phi_consistency():
+def test_phi_consistency(_phsp):
     """
     Check that sin2 + cos2 phi = 1
 
     """
-    ...
+    pi1, pi2, k1, k2, _ = _phsp
+
+    sin = parameterisation.sin_phi(k1, pi1, k2, pi2)
+    cos = parameterisation._cos_phi(k1, pi1, k2, pi2)
+
+    sum = sin ** 2 + cos ** 2
+
+    plt.hist(sum, bins=np.linspace(0.5, 1.5))
+    plt.title(r"$sin^2(\phi) + cos^2(\phi)$")
+
+    plt.savefig("sin_cos.png")
+    plt.clf()
 
 
-def test_boosts():
+def test_boosts(_phsp):
     """
     Check that boosts correctly take us into the rest frame of our particle
 
     """
-    ...
+    pi1, pi2, k1, k2, _ = _phsp
+
+    def _3momm(particle):
+        if isinstance(particle, pylorentz.Momentum4):
+            return np.sqrt(particle.p_x ** 2 + particle.p_y ** 2 + particle.p_z ** 2)
+        return np.sqrt(particle[0] ** 2 + particle[1] ** 2 + particle[2] ** 2)
+
+    def _plot(a, k, pi, title):
+        """
+        Plot particles on an axis
+        """
+        kw = {"histtype": "step", "bins": np.linspace(0.0, 2.0)}
+
+        a.hist(_3momm(k), label=r"$K$", **kw)
+        a.hist(_3momm(pi), label=r"$\pi$", **kw)
+
+        combined = k + pi if isinstance(k, pylorentz.Momentum4) else np.add(k, pi)
+        a.hist(_3momm(combined), label=r"$K\pi$", **kw)
+
+        a.set_title(title)
+        a.legend()
+        a.set_xlabel(r"$|\vec{p}|$")
+        a.set_ylabel("Count")
+
+    fig, ax = plt.subplots(2, 2, figsize=(10, 10))
+    _plot(ax[0, 0], k1, pi1, "Lab Frame")
+
+    # Boost particles into the k frame
+    boosted_k, boosted_pi1 = parameterisation._boost(k1, k1, pi1)
+    _plot(ax[0, 1], boosted_k, boosted_pi1, "K Frame")
+
+    # Boost particles into the pi frame
+    boosted_k, boosted_pi1 = parameterisation._boost(pi1, k1, pi1)
+    _plot(ax[1, 0], boosted_k, boosted_pi1, title=r"$\pi$ Frame")
+
+    # Boost particles into the k+pi frame
+    boosted_k, boosted_pi1 = parameterisation._boost(np.add(pi1, k1), k1, pi1)
+    _plot(ax[1, 1], boosted_k, boosted_pi1, title=r"$K\pi$ Frame")
+
+    fig.suptitle(r"3 Momenta of K, $\pi$ in different frames")
+
+    plt.savefig("boosts.png")
+
+
+def test_correlation(_phsp):
+    """
+    Plot correlations
+
+    """
+    pi1, pi2, k1, k2, t = _phsp
+    points = parameterisation.helicity_param(k1, pi1, k2, pi2, t, verbose=True)
+
+    d = len(points[0])
+    corr = np.ones((d, d))
+
+    for i in range(d):
+        for j in range(d):
+            corr[i, j] = np.abs(np.corrcoef(points[:, i], points[:, j])[0, 1])
+
+    fig, ax = plt.subplots()
+    labels = (
+        r"$M(K^+\pi^+) /GeV$",
+        r"$M(K^-\pi^-)$",
+        r"$cos(\theta^+)$",
+        r"$cos(\theta^-)$",
+        r"$\phi$",
+        r"$t /ps$",
+    )
+
+    im = ax.imshow(corr)
+    ax.set_title("Correlations")
+    ax.set_xticks([i for i in range(6)])
+    ax.set_xticklabels(labels, rotation=90)
+    ax.set_yticks([i for i in range(6)])
+    ax.set_yticklabels(labels)
+
+    fig.subplots_adjust(right=0.9)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    fig.colorbar(im, cax=cbar_ax)
+
+    fig.subplots_adjust(bottom=0.25)
+    fig.subplots_adjust(left=0.1)
+
+    plt.savefig("correlations.png")

@@ -43,5 +43,5 @@ jobs:
     - name: Upload Plots
       uses: actions/upload-artifact@v2
       with:
-        name: phsp-plot
-        path: helicity_phsp.png
+        name: plots
+        path: ./*.png
