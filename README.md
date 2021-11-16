@@ -90,7 +90,7 @@ pi_minus = np.array(
 # Parameterise
 # Since this function is meant for decays X->h1+ h2- h3- h4+, pass the particles in in  
 # the order K+ K- pi- pi+
-points = helicity_param(k_plus)
+points = helicity_param(k_plus, k_minus, pi_minus, pi_plus)
 
 print(points.shape)  # prints (N, 5); we have an array of N 5d points
 
@@ -104,7 +104,6 @@ for i, a in enumerate(ax):
     a.set_xlabel(labels[i])
 
 plt.savefig("example.png")
-
 ```
 
 ## [Dashboard](doc/dashboard/README.md)
