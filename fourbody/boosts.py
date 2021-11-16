@@ -10,26 +10,12 @@ def _stationary(particles):
     """
     Returns bool mask of whether particles are stationary
 
-    TODO speedup
-
     """
-    # Start by assuming all particles are moving
-    n_particles = len(particles[0])
-    rv = np.zeros(n_particles, dtype=np.bool_)
+    # Check if 3 momenta components are close to 0
+    zeros = np.isclose(particles[:3], 0.0)
 
-    # A particle is stationary if any of its x, y or z momenta are not close to 0
-    # For our purposes, this means <10^-7 or so
-    # If this causes a bug, its your own fault for using units where 10^-7 is a meaningful nonzero momentum
-    for i in range(n_particles):
-        if (
-            np.isclose(particles[0][i], 0.0)
-            and np.isclose(particles[1][i], 0.0)
-            and np.isclose(particles[2][i], 0.0)
-        ):
-            # The particle is stationary
-            rv[i] = True
-
-    return rv
+    # If all three components are close to 0 then our particle is stationary
+    return np.all(zeros, axis=0)
 
 
 def _convert_to_pylorentz(*particles):
