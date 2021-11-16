@@ -169,7 +169,7 @@ def test_correlation(_phsp):
 
     fig, ax = plt.subplots()
     labels = (
-        r"$M(K^+\pi^+) /GeV$",
+        r"$M(K^+\pi^+)$",
         r"$M(K^-\pi^-)$",
         r"$cos(\theta^+)$",
         r"$cos(\theta^-)$",
