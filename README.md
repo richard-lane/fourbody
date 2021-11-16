@@ -29,7 +29,7 @@ evaluated using the formulae in [^2].
  to pi+ pi- pi+ pi-$ amplitudes. JHEP, 01, 144. doi:10.1007/JHEP01(2018)144
 
 ## Requirements
-Basic functionality requires:
+The `fourbody` package requires:
  ```
  numpy
  pylorentz
@@ -44,11 +44,10 @@ Additionally, if you wish to run the [unit tests](test/ut/), [integration](test/
 
 ## Installation
 `pip install fourbody`  
-This doesn't work yet but hopefully it will soon.  
-Otherwise just clone this repo
+Note that this only installs the package, and not the tests.
 
 ## API
-All the functionality is provided by a single function, [`fourbody.param.helicity_param`](fourbody/param.py#L24).
+Phase space parameterisation is provided with the function [`fourbody.param.helicity_param`](fourbody/param.py#L24).
 
 ## Example
 A complete example showing how to read arrays from a ROOT file using `uproot`,
