@@ -31,7 +31,7 @@ def _phsp():
         x_mass, (a_mass, b_mass, c_mass, d_mass), names=("a", "b", "c", "d")
     )
 
-    N = 50000  # Number of evts to generate, but some will get thrown away
+    N = 500000  # Number of evts to generate, but some will get thrown away
     weights, particles = generator.generate(N, normalize_weights=True)
 
     # Create a mask for accept-reject based on weights
