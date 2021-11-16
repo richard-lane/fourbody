@@ -1,9 +1,12 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python application
+name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   Tests:
@@ -44,3 +47,20 @@ jobs:
       with:
         name: plots
         path: ./*.png
+    - name: Check out my other private repo
+      uses: actions/checkout@v2
+      with:
+        path: other_repo
+        ref: validation_plots
+    - name: Cache plots
+    # Checkout my plot storage branch, amend the commit on it to contain the lastest plots, push
+    # Amend commit then gc to prevent the repo from growing out of control
+      run: |
+        cd other_repo
+        mv ../helicity_phsp.png ../sin_cos.png ../boosts.png ../correlations.png .
+        git config user.name "Automated Commit"
+        git config user.email "none@none.com"
+        git add helicity_phsp.png sin_cos.png boosts.png correlations.png
+        git commit --amend -m "Plots cached on: `date`"
+        git push -f origin validation_plots
+        git gc
