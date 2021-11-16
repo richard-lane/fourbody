@@ -42,11 +42,6 @@ jobs:
       with:
         fail_ci_if_error: true
         files: ut.xml,it.xml,validation.xml
-    - name: Upload Plots
-      uses: actions/upload-artifact@v2
-      with:
-        name: plots
-        path: ./*.png
     - name: Check out my other private repo
       uses: actions/checkout@v2
       with:

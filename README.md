@@ -47,7 +47,7 @@ This doesn't work yet but hopefully it will soon.
 Otherwise just clone this repo
 
 ## API
-All the functionality is provided by a single function, [`fourbody.param.helicity_param`](fourbody/param.py#24).
+All the functionality is provided by a single function, [`fourbody.param.helicity_param`](fourbody/param.py#L24).
 
 ## Example
 ```python
