@@ -36,7 +36,6 @@ def helicity_param(
         Cosine angle of h1 wrt parent particle, in the CoM frame of + charged particle system
         Cosine angle of h2 wrt parent particle, in the CoM frame of - charged particle system
         Angle between + and - system decay planes
-        time
 
     :param h1_plus: array of +ve charged hadron parameters, (px, py, pz, energy).
                     Each entry in this array should be an N-length array of momenta; overall shape is (4, N) for N particles.
