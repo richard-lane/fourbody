@@ -1,6 +1,7 @@
 # fourbody
 [![Github Actions](https://github.com/richard-lane/fourbody/workflows/CI/badge.svg)](https://github.com/richard-lane/fourbody/actions)
 [![codecov](https://codecov.io/gh/richard-lane/fourbody/branch/main/graph/badge.svg?token=BCP1DP2V3L)](https://codecov.io/gh/richard-lane/fourbody)
+[![CodeQL](https://github.com/richard-lane/fourbody/workflows/CodeQL/badge.svg)](https://github.com/richard-lane/fourbody/actions)
 
 Four body phase space parameterisation using invariant masses and helicity angles: (M+, M-, cos(θ+), cos(θ-), ϕ).
 
