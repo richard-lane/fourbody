@@ -50,6 +50,9 @@ Otherwise just clone this repo
 All the functionality is provided by a single function, [`fourbody.param.helicity_param`](fourbody/param.py#L24).
 
 ## Example
+A complete example showing how to read arrays from a ROOT file using `uproot`,
+parameterise points using the code in this package + plot projections using `matplotlib`.
+
 ```python
 """ Example for the decay D->K+K-pi+pi- """
 import uproot
