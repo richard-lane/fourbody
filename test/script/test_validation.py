@@ -165,7 +165,7 @@ def test_correlation(_phsp):
 
     for i in range(d):
         for j in range(d):
-            corr[i, j] = np.abs(np.corrcoef(points[:, i], points[:, j])[0, 1])
+            corr[i, j] = np.corrcoef(points[:, i], points[:, j])[0, 1]
 
     fig, ax = plt.subplots()
     labels = (
@@ -176,7 +176,8 @@ def test_correlation(_phsp):
         r"$\phi$",
     )
 
-    im = ax.imshow(corr)
+    plt.set_cmap("seismic")
+    im = ax.imshow(corr, vmin=-1.0, vmax=1.0)
     ax.set_title("Correlations")
     ax.set_xticks([i for i in range(d)])
     ax.set_xticklabels(labels, rotation=90)
