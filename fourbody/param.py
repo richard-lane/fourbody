@@ -60,9 +60,10 @@ def helicity_param(
     cos_theta_minus = util.cos_theta(h2_minus, h3_minus, d)
 
     # Find phi
-    cosphi = util.cos_phi(h1_plus, h2_minus, h3_minus, h4_plus)
+    phi = util.phi(
+        util.cos_phi(h1_plus, h2_minus, h3_minus, h4_plus),
+        util.sin_phi(h1_plus, h2_minus, h3_minus, h4_plus),
+    )
 
     # Return
-    return np.column_stack(
-        (m_plus, m_minus, cos_theta_plus, cos_theta_minus, np.arccos(cosphi))
-    )
+    return np.column_stack((m_plus, m_minus, cos_theta_plus, cos_theta_minus, phi))

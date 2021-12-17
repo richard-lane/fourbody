@@ -68,7 +68,7 @@ def test_projections(_phsp):
         np.linspace(0.6, 1.4),
         np.linspace(0.0, 1.0),
         np.linspace(0.0, 1.0),
-        np.linspace(0.0, np.pi),
+        np.linspace(-np.pi, np.pi),
     )
 
     for i, (a, l, b) in enumerate(zip(ax.flatten()[:-1], labels, bins)):

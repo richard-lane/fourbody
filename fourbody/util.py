@@ -102,3 +102,21 @@ def cos_phi(k, pi1, pi2, pi3):
 
     # Dot them together by multiplying elementwise then summing
     return (plus_cross * minus_cross).sum(1) / (plus_cross_mag * minus_cross_mag)
+
+
+def phi(cosphi: np.ndarray, sinphi: np.ndarray) -> np.ndarray:
+    """
+    Find phi given the values of cos and sin phi
+    Finds the right value of phi in (-pi, pi)
+
+    :param cosphi: cos phi values
+    :param sinphi: sin phi values
+    :returns: array of phi values
+
+    """
+    negative_sins = sinphi < 0.0
+
+    phi_vals = np.arccos(cosphi)
+    phi_vals[negative_sins] *= -1.0
+
+    return phi_vals

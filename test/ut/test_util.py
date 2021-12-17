@@ -51,3 +51,17 @@ def test_m_plus_minus():
 
     assert np.allclose(mplus, util._invariant_masses(*np.add(k, pi3)))
     assert np.allclose(mminus, util._invariant_masses(*np.add(pi1, pi2)))
+
+
+def test_phi_range():
+    """
+    Check we get the right phi back when we pass -ve or +ve phis
+
+    """
+    phis = np.linspace(-np.pi, np.pi)
+    cosphis = np.cos(phis)
+    sinphis = np.sin(phis)
+
+    calculated_phis = util.phi(cosphis, sinphis)
+
+    assert np.allclose(calculated_phis, phis)
