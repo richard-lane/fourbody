@@ -31,11 +31,9 @@ jobs:
         pytest test/ut/ --cov=./ --cov-report=xml:ut.xml
     - name: Integration Test
       run: |
-        pip install phasespace
         pytest test/it/ --cov=./ --cov-report=xml:it.xml
     - name: Validation
       run: |
-        pip install matplotlib
         pytest test/script/ -W error::UserWarning --cov=./ --cov-report=xml:validation.xml
     - name: Upload coverage
       uses: codecov/codecov-action@v1
