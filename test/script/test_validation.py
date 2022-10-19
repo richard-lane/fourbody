@@ -77,7 +77,7 @@ def test_projections(_phsp):
         a.set_xlabel(l)
 
     ax.flatten()[-1].legend()
-    fig.set_tight_layout(True)
+    fig.tight_layout()
 
     path = "helicity_phsp.png"
     plt.savefig(path)
@@ -94,7 +94,7 @@ def test_phi_consistency(_phsp):
     sin = util.sin_phi(k1, pi1, k2, pi2)
     cos = util.cos_phi(k1, pi1, k2, pi2)
 
-    sum = sin ** 2 + cos ** 2
+    sum = sin**2 + cos**2
 
     plt.hist(sum, bins=np.linspace(0.5, 1.5))
     plt.title(r"$sin^2(\phi) + cos^2(\phi)$")
@@ -112,7 +112,7 @@ def test_boosts(_phsp):
 
     def _3momm(particle):
         if isinstance(particle, pylorentz.Momentum4):
-            return np.sqrt(particle.p_x ** 2 + particle.p_y ** 2 + particle.p_z ** 2)
+            return np.sqrt(particle.p_x**2 + particle.p_y**2 + particle.p_z**2)
         return np.sqrt(particle[0] ** 2 + particle[1] ** 2 + particle[2] ** 2)
 
     def _plot(a, k, pi, title):
@@ -192,3 +192,85 @@ def test_correlation(_phsp):
     fig.subplots_adjust(left=0.1)
 
     plt.savefig("correlations.png")
+
+
+def test_masses_correlation(_phsp):
+    """
+    Plot correlations
+
+    """
+    # Copied loads of code from above but its probably fine
+    pi1, pi2, k1, k2 = _phsp
+    points = param.inv_mass_param(pi1, pi2, k1, k2)
+
+    d = len(points[0])
+    corr = np.ones((d, d))
+
+    for i in range(d):
+        for j in range(d):
+            corr[i, j] = np.corrcoef(points[:, i], points[:, j])[0, 1]
+
+    fig, ax = plt.subplots()
+    labels = (
+        r"$M(\pi^+\pi^-)$",
+        r"$M(\pi^-K^+)$",
+        r"$M(K^+K^-)$",
+        r"$M(\pi^+\pi^-K^+)$",
+        r"$M(\pi^-K^+K^-)$",
+    )
+
+    plt.set_cmap("seismic")
+    im = ax.imshow(corr, vmin=-1.0, vmax=1.0)
+    ax.set_title("Correlations")
+    ax.set_xticks([i for i in range(d)])
+    ax.set_xticklabels(labels, rotation=90)
+    ax.set_yticks([i for i in range(d)])
+    ax.set_yticklabels(labels)
+
+    fig.subplots_adjust(right=0.9)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    fig.colorbar(im, cax=cbar_ax)
+
+    fig.subplots_adjust(bottom=0.25)
+    fig.subplots_adjust(left=0.1)
+
+    plt.savefig("mass_correlations.png")
+
+
+def test_mass_projections(_phsp):
+    # Lots of repeated code again
+    # Generate phsp
+    pi1, pi2, k1, k2 = _phsp
+
+    # Parametrise
+    points = param.inv_mass_param(pi1, pi2, k1, k2)
+
+    # Plot projections
+    fig, ax = plt.subplots(2, 3, figsize=(12, 6))
+    kw = {"histtype": "step"}
+    labels = (
+        r"$M(\pi^+\pi^-)$",
+        r"$M(\pi^-K^+)$",
+        r"$M(K^+K^-)$",
+        r"$M(\pi^+\pi^-K^+)$",
+        r"$M(\pi^-K^+K^-)$",
+    )
+    bins = (
+        np.linspace(0.2, 1.0),
+        np.linspace(0.5, 1.5),
+        np.linspace(0.9, 1.7),
+        np.linspace(0.5, 1.5),
+        np.linspace(1.0, 1.8),
+    )
+
+    for i, (a, l, b) in enumerate(zip(ax.flatten()[:-1], labels, bins)):
+        kw["bins"] = b
+        a.hist(points[:, i], **kw, label="Phsp")
+        a.set_xlabel(l)
+
+    ax.flatten()[-1].legend()
+    fig.tight_layout()
+
+    path = "masses_phsp.png"
+    plt.savefig(path)
+    plt.clf()

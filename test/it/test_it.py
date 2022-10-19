@@ -82,6 +82,6 @@ def test_sin_cos_phi_consistency(_phsp):
     sin_phi = util.sin_phi(a, b, c, d)
     cos_phi = util.cos_phi(a, b, c, d)
 
-    sum = sin_phi ** 2 + cos_phi ** 2
+    sum = sin_phi**2 + cos_phi**2
 
     assert np.allclose(sum, np.ones_like(a[0]))
