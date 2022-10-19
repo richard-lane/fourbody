@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name="fourbody",
     packages=["fourbody"],
-    version="0.3",
+    version="0.4",
     license="MIT",
     description="Phase space parameterisation for four-body decays X -> h1+ h2- h3- h4+",
     long_description="See the projet homepage for details",

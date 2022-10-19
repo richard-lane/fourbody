@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install black==21.10b0 numpy pylorentz pytest pytest-cov
+        pip install -r requirements.txt
     - name: Lint with black
       run: |
         black --check fourbody/**
@@ -52,10 +52,10 @@ jobs:
     # Amend commit then gc to prevent the repo from growing out of control
       run: |
         cd other_repo
-        mv ../helicity_phsp.png ../sin_cos.png ../boosts.png ../correlations.png .
+        mv ../helicity_phsp.png ../sin_cos.png ../boosts.png ../correlations.png ../mass_correlations.png ../masses_phsp.png .
         git config user.name "Automated Commit"
         git config user.email "none@none.com"
-        git add helicity_phsp.png sin_cos.png boosts.png correlations.png
+        git add helicity_phsp.png sin_cos.png boosts.png correlations.png mass_correlations.png masses_phsp.png
         git commit --amend -m "Plots cached on: `date`"
         git push -f origin validation_plots
         git gc

@@ -24,3 +24,9 @@ check that the appropriate three-momenta are 0.
 ### Correlations
 Find correlations between phase space variables; plot a heatmap.
 ![correlations](/../validation_plots/correlations.png)
+
+## Invariant mass parameterisation
+An additional, usually worse, parameterisation using only invariant masses is also provided.
+![massproj](/../validation_plots/masses_phsp.png)
+
+![masscorr](/../validation_plots/mass_correlations.png)

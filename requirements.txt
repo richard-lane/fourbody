@@ -1,0 +1,7 @@
+black==22.3.0
+numpy==1.23.3
+pylorentz==0.3.3
+pytest
+pytest-cov
+matplotlib==3.6.1
+phasespace==1.7.0
